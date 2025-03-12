@@ -30,23 +30,19 @@ class Albumentations:
             check_version(A.__version__, "1.0.3", hard=True)  # version requirement
 
             T = [
-                A.GaussNoise(var_limit=(50, 80), p=0.8),  # больше шума, чаще
-                A.RandomBrightnessContrast(brightness_limit=(-0.5, 0.5), contrast_limit=(-0.5, 1.0), p=0.8),
-                # меняем яркость и контраст, чаще
-                A.GaussianBlur(blur_limit=(5, 8), p=0.6),  # размытие
-                A.MotionBlur(blur_limit=(5, 7), p=0.5),  # размытие в движении
-                A.MedianBlur(blur_limit=7, p=0.4),  # медианное размытие
-                A.HueSaturationValue(hue_shift_limit=20, sat_shift_limit=30, val_shift_limit=20, p=0.5),
-                # изменения цвета
-                A.CLAHE(clip_limit=4.0, tile_grid_size=(5, 5), p=0.3),
-                # для улучшения контраста и возможного усиления шума
-                A.Sharpen(alpha=(0.1, 0.3), lightness=(0.9, 1.1), p=0.3),
-                # резкость
-                A.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3, p=0.3),
-                # случайные изменения цвета
-                A.ToGray(p=0.1),  # иногда делаем изображение серым
-                A.Posterize(num_bits=4, p=0.2),  # уменьшаем количество цветов
-                A.Solarize(thresholds=(32, 128), p=0.1),
+                A.ElasticTransform(alpha=1, sigma=50, alpha_affine=50, p=0.5),
+                A.RandomResizedCrop(height=size, width=size, scale=(0.8, 1.0), ratio=(0.9, 1.11), p=0.0),
+                A.GaussNoise(var_limit=(2, 3), p=0.2),
+                A.RandomBrightnessContrast(brightness_limit=(0.0, 0.2), contrast_limit=(-0.2, 0.2), p=0.5),
+                A.GaussianBlur(blur_limit=(2, 5), p=0.6),
+                A.MotionBlur(blur_limit=(2, 4), p=0.5),
+                A.MedianBlur(blur_limit=4, p=0.8),
+                A.HueSaturationValue(hue_shift_limit=10, sat_shift_limit=20, val_shift_limit=20, p=0.5),
+                A.CLAHE(clip_limit=2.0, tile_grid_size=(2, 2), p=0.3),
+                A.Sharpen(alpha=(0.05, 0.15), lightness=(0.95, 1.05), p=0.3),
+                A.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1, p=0.2),
+                A.ToGray(p=0.05),  # Уменьшена вероятность
+                A.Posterize(num_bits=6, p=0.1),  # Увеличен num_bits и уменьшена вероятность
             ]  # transforms
             self.transform = A.Compose(T, bbox_params=A.BboxParams(format="yolo", label_fields=["class_labels"]))
 
